@@ -11,7 +11,9 @@ namespace dl
 	class Library
 	{
 	public:
-		explicit Library(std::filesystem::path& path);
+		explicit Library(const std::filesystem::path& path);
+		explicit Library(const Backend::Handle& handle);
+
 		~Library() noexcept;
 
 		Library(const Library&) = delete;

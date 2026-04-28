@@ -3,11 +3,15 @@
 namespace dl
 {
 	template <typename Backend>
-	Library<Backend>::Library(std::filesystem::path& path) :
+	Library<Backend>::Library(const std::filesystem::path& path) :
 		_handle(nullptr)
 	{
 		_handle = Backend::loadLibrary(path);
 	}
+
+	template <typename Backend>
+	Library<Backend>::Library(const typename Backend::Handle& handle) :
+		_handle(handle) {}
 
 	template <typename Backend>
 	Library<Backend>::~Library() noexcept
