@@ -1,0 +1,24 @@
+# Prerequisites: CMake build directories
+/cmake-build-*/
+/build/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# CLion / JetBrains specific
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
