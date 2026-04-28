@@ -7,7 +7,7 @@
 
 namespace dl
 {
-	template <typename Backend = backend::defaultBackend>
+	template <typename Backend = backend::DefaultBackend>
 	class Library
 	{
 	public:
