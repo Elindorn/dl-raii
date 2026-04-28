@@ -51,6 +51,6 @@ namespace dl
 		if (_handle == Backend::nullHandle)
 			throw std::runtime_error("Handle is null when trying to get symbol");
 
-		return Backend::getSymbol(_handle, path);
+		return Backend::getSymbol(_handle, path.c_str());
 	}
 }
