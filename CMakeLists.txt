@@ -5,8 +5,10 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_library(dl_raii INTERFACE
         include/dl_raii/library.hpp
+        include/dl_raii/util.hpp
         include/dl_raii/impl/defaultBackend.hpp
         include/dl_raii/impl/library.ipp
+        include/dl_raii/impl/util.ipp
 )
 
 add_library(dl_raii::dl_raii ALIAS dl_raii)
