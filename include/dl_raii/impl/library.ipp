@@ -6,6 +6,9 @@ namespace dl
 	Library<Backend>::Library(const std::filesystem::path& path) :
 		_handle(nullptr)
 	{
+		if (!std::filesystem::is_regular_file(path))
+			throw std::invalid_argument("path is not a regular file");
+
 		_handle = Backend::loadLibrary(path);
 	}
 
