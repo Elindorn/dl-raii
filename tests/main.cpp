@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <dl_raii/library.hpp>
+#include <dl_raii/util.hpp>
 
 std::filesystem::path validPath = TEST_LIBRARY_PATH;
 
@@ -43,11 +44,64 @@ TEST_CASE("Functionality", "[library]")
 	SECTION("Move semantics")
 	{
 		dl::Library library1(validPath);
+		auto* factorial1 = reinterpret_cast<uint64_t(*)(uint64_t)>(library1.getSymbol("factorial"));
 
-		auto* factorial = reinterpret_cast<uint64_t(*)(uint64_t)>(library1.getSymbol("factorial"));
 		dl::Library library2(std::move(library1));
+		auto* factorial2 = reinterpret_cast<uint64_t(*)(uint64_t)>(library2.getSymbol("factorial"));
 
-		CHECK(factorial == reinterpret_cast<uint64_t(*)(uint64_t)>(library2.getSymbol("factorial")));
+		CHECK(factorial1 == factorial2);
 		CHECK_THROWS(library1.getSymbol("fibonacci"));
+
+		dl::Library library3 = std::move(library2);
+		auto* factorial3 = reinterpret_cast<uint64_t(*)(uint64_t)>(library3.getSymbol("factorial"));
+
+		CHECK(factorial2 == factorial3);
+		CHECK_THROWS(library2.getSymbol("fibonacci"));
+	}
+}
+
+TEST_CASE("Demangling", "[library]")
+{
+	SECTION("Demangling")
+#if defined(_MSC_VER)
+	{
+		CHECK(dl::util::demangle("?f@@YAXHDN@Z") == "void f(int,char,double)");
+		CHECK(dl::util::demangle("?f@@YAXKE@Z") == "void f(unsigned long,unsigned char)");
+		CHECK(dl::util::demangle("?f@@YAXPAM@Z") == "void f(float *)");
+
+		CHECK(dl::util::demangle("?Func@Namespace@@YAXXZ") == "void Namespace::Func()");
+		CHECK(dl::util::demangle("?Func@Inner@Outer@@YAXH@Z") == "void Outer::Inner::Func(int)");
+		CHECK(dl::util::demangle("?Method@MyClass@@QBEXXZ") == "void MyClass::Method()const ");
+		CHECK(dl::util::demangle("??$f@H@@YAXH@Z") == "void f<int>(int)");
+
+		CHECK(dl::util::demangle("??$f@H@@YAXH@Z") == "void f<int>(int)");
+		CHECK(dl::util::demangle("??H@YAXHH@Z") == "void operator+(int,int)");
+		CHECK(dl::util::demangle("??2@YAPAXI@Z") == "void * operator new(unsigned int)");
+		CHECK(dl::util::demangle("??1MyClass@@UAE@XZ") == "MyClass::~MyClass()");
+	}
+#elif defined(__GNUC__) || defined(__clang__)
+	{
+		CHECK(dl::util::demangle("_Z1ficd") == "f(int, char, double)");
+		CHECK(dl::util::demangle("_Z1fm") == "f(unsigned long)");
+		CHECK(dl::util::demangle("_Z1fPf") == "f(float*)");
+
+		CHECK(dl::util::demangle("_ZN9Namespace4FuncEv") == "Namespace::Func()");
+		CHECK(dl::util::demangle("_ZN5Outer5Inner4FuncEi") == "Outer::Inner::Func(int)");
+		CHECK(dl::util::demangle("_ZNK7MyClass6MethodEv") == "MyClass::Method() const");
+		CHECK(dl::util::demangle("_Z1fIiEvT_") == "void f<int>(int)");
+
+		CHECK(dl::util::demangle("_Zpl") == "operator+");
+		CHECK(dl::util::demangle("_Zix") == "operator[]");
+		CHECK(dl::util::demangle("_Znw") == "operator new");
+		CHECK(dl::util::demangle("_ZN7MyClassD1Ev") == "MyClass::~MyClass()");
+	}
+#endif
+
+	SECTION("Demangling errors")
+	{
+		CHECK(dl::util::demangle("_X123") == "_X123");
+		CHECK(dl::util::demangle("???") == "???");
+		CHECK(dl::util::demangle("") == "");
+		CHECK(dl::util::demangle("_Z") == "_Z");
 	}
 }
