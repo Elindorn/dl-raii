@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.2)
+cmake_minimum_required(VERSION 3.20)
 
 project(dl_raii LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
@@ -7,6 +7,7 @@ add_library(dl_raii INTERFACE
         include/dl_raii/library.hpp
         include/dl_raii/util.hpp
         include/dl_raii/impl/defaultBackend.hpp
+        include/dl_raii/impl/backendConcept.hpp
         include/dl_raii/impl/library.ipp
         include/dl_raii/impl/util.ipp
 )

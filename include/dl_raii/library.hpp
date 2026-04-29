@@ -4,10 +4,11 @@
 #include <filesystem>
 
 #include <dl_raii/impl/defaultBackend.hpp>
+#include <dl_raii/impl/backendConcept.hpp>
 
 namespace dl
 {
-	template <typename Backend = backend::DefaultBackend>
+	template <backend::BackendConcept Backend = backend::DefaultBackend>
 	class Library
 	{
 	public:

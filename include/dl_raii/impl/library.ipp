@@ -2,7 +2,7 @@
 
 namespace dl
 {
-	template <typename Backend>
+	template <backend::BackendConcept Backend>
 	Library<Backend>::Library(const std::filesystem::path& path) :
 		_handle(nullptr)
 	{
@@ -12,25 +12,25 @@ namespace dl
 		_handle = Backend::loadLibrary(path);
 	}
 
-	template <typename Backend>
+	template <backend::BackendConcept Backend>
 	Library<Backend>::Library(const typename Backend::Handle& handle) :
 		_handle(handle) {}
 
-	template <typename Backend>
+	template <backend::BackendConcept Backend>
 	Library<Backend>::~Library() noexcept
 	{
 		if (_handle != Backend::nullHandle)
 			Backend::unloadLibrary(_handle);
 	}
 
-	template <typename Backend>
+	template <backend::BackendConcept Backend>
 	Library<Backend>::Library(Library&& other) noexcept
 	{
 		_handle = other._handle;
 		other._handle = Backend::nullHandle;
 	}
 
-	template <typename Backend>
+	template <backend::BackendConcept Backend>
 	Library<Backend>& Library<Backend>::operator=(Library&& other) noexcept
 	{
 		if (this != &other)
@@ -45,7 +45,7 @@ namespace dl
 		return *this;
 	}
 
-	template <typename Backend>
+	template <backend::BackendConcept Backend>
 	void* Library<Backend>::getSymbol(const std::string& name) const
 	{
 		if (_handle == Backend::nullHandle)
@@ -54,7 +54,7 @@ namespace dl
 		return Backend::getSymbol(_handle, name.c_str());
 	}
 
-	template <typename Backend>
+	template <backend::BackendConcept Backend>
 	template <typename F> requires std::is_function_v<F>
 	F* Library<Backend>::getFunction(const std::string& name) const
 	{
