@@ -4,6 +4,20 @@
 
 namespace dl::backend
 {
+	/**
+	 * @brief Concept describing the requirements for a dynamic library backend.
+	 *
+	 * A type `B` satisfies `BackendConcept` if it provides:
+	 * - A nested type `B::Handle` (e.g., `void*` or `HMODULE`)
+	 * - A nested convertible to string_view field `B::prefix`
+	 * - A nested convertible to string_view field `B::postfix`
+	 * - A nested convertible to string_view field `B::extension`
+	 * - `static Handle open(const std::filesystem::path& path)`
+	 * - `static void close(Handle handle) noexcept`
+	 * - `static void* getSymbol(Handle handle, const std::string& name)`
+	 *
+	 * @see dl::Library, dl::backend::DefaultBackend
+	 */
 	template<typename Backend>
 	concept BackendConcept = requires
 	{
