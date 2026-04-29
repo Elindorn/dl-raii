@@ -46,11 +46,21 @@ namespace dl
 	}
 
 	template <typename Backend>
-	void* Library<Backend>::getSymbol(const std::string& path) const
+	void* Library<Backend>::getSymbol(const std::string& name) const
 	{
 		if (_handle == Backend::nullHandle)
 			throw std::runtime_error("Handle is null when trying to get symbol");
 
-		return Backend::getSymbol(_handle, path.c_str());
+		return Backend::getSymbol(_handle, name.c_str());
+	}
+
+	template <typename Backend>
+	template <typename F> requires std::is_function_v<F>
+	F* Library<Backend>::getFunction(const std::string& name) const
+	{
+		if (_handle == Backend::nullHandle)
+			throw std::runtime_error("Handle is null when trying to get function");
+
+		return reinterpret_cast<F*>(Backend::getSymbol(_handle, name.c_str()));
 	}
 }

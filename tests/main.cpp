@@ -30,6 +30,11 @@ TEST_CASE("Functionality", "[library]")
 		auto* fibonacci = reinterpret_cast<uint64_t(*)(uint64_t)>(library.getSymbol("fibonacci"));
 		auto* factorial = reinterpret_cast<uint64_t(*)(uint64_t)>(library.getSymbol("factorial"));
 
+		CHECK(fibonacci == library.getFunction<uint64_t(uint64_t)>("fibonacci"));
+		CHECK(factorial == library.getFunction<uint64_t(uint64_t)>("factorial"));
+
+		CHECK(factorial != fibonacci);
+
 		CHECK(factorial(1) == 1);
 		CHECK(factorial(2) == 2);
 		CHECK(factorial(3) == 6);
@@ -44,16 +49,16 @@ TEST_CASE("Functionality", "[library]")
 	SECTION("Move semantics")
 	{
 		dl::Library library1(validPath);
-		auto* factorial1 = reinterpret_cast<uint64_t(*)(uint64_t)>(library1.getSymbol("factorial"));
+		auto* factorial1 = library1.getFunction<uint64_t(uint64_t)>("factorial");
 
 		dl::Library library2(std::move(library1));
-		auto* factorial2 = reinterpret_cast<uint64_t(*)(uint64_t)>(library2.getSymbol("factorial"));
+		auto* factorial2 = library2.getFunction<uint64_t(uint64_t)>("factorial");
 
 		CHECK(factorial1 == factorial2);
 		CHECK_THROWS(library1.getSymbol("fibonacci"));
 
 		dl::Library library3 = std::move(library2);
-		auto* factorial3 = reinterpret_cast<uint64_t(*)(uint64_t)>(library3.getSymbol("factorial"));
+		auto* factorial3 = library3.getFunction<uint64_t(uint64_t)>("factorial");
 
 		CHECK(factorial2 == factorial3);
 		CHECK_THROWS(library2.getSymbol("fibonacci"));

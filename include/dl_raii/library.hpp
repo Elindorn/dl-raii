@@ -22,8 +22,10 @@ namespace dl
 		Library(Library&&) noexcept;
 		Library& operator=(Library&&) noexcept;
 
-		[[nodiscard]]
-		void* getSymbol(const std::string& path) const;
+		[[nodiscard]] void* getSymbol(const std::string& name) const;
+
+		template <typename F> requires std::is_function_v<F>
+		[[nodiscard]] F* getFunction(const std::string& name) const;
 
 	private:
 		Backend::Handle _handle;
