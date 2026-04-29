@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <filesystem>
 
 namespace dl::backend
@@ -27,10 +28,10 @@ namespace dl::backend
 		{ Backend::postfix } -> std::convertible_to<std::string_view>;
 		{ Backend::extension } -> std::convertible_to<std::string_view>;
 	} &&
-	requires(const std::filesystem::path& path, typename Backend::Handle, const std::string& symbol)
+	requires(const std::filesystem::path& path, typename Backend::Handle handle, const char* symbol)
 	{
 		{ Backend::loadLibrary(path) } -> std::same_as<typename Backend::Handle>;
-		{ Backend::getSymbol(symbol) } -> std::same_as<void*>;
-		{ Backend::unloadLibrary(path) } noexcept -> std::same_as<void>;
+		{ Backend::getSymbol(handle, symbol) } -> std::same_as<void*>;
+		{ Backend::unloadLibrary(handle) } noexcept -> std::same_as<void>;
 	};
 }

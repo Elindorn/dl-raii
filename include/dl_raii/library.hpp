@@ -21,7 +21,7 @@ namespace dl
 	 *
 	 * Example usage:
 	 * @code
-	 *   auto lib = dl::Library<>::load("myplugin");
+	 *   auto lib = dl::Library::load("myplugin");
 	 *   auto greet = lib.getFunction<void()>("greet");
 	 *   greet();
 	 * @endcode
