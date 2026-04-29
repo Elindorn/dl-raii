@@ -17,6 +17,16 @@ namespace dl
 		_handle(handle) {}
 
 	template <backend::BackendConcept Backend>
+	Library<Backend> Library<Backend>::load(const std::filesystem::path& path)
+	{
+		const std::filesystem::path dir = path.parent_path();
+		const std::string filename =
+			Backend::prefix + path.filename().string() + Backend::postfix + "." + Backend::extension;
+
+		return Library<Backend>(dir / filename);
+	}
+
+	template <backend::BackendConcept Backend>
 	Library<Backend>::~Library() noexcept
 	{
 		if (_handle != Backend::nullHandle)

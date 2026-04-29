@@ -15,6 +15,8 @@ namespace dl
 		explicit Library(const std::filesystem::path& path);
 		explicit Library(const Backend::Handle& handle);
 
+		static Library load(const std::filesystem::path& path);
+
 		~Library() noexcept;
 
 		Library(const Library&) = delete;
