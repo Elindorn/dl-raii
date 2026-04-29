@@ -3,6 +3,11 @@
 #include <stdexcept>
 #include <filesystem>
 #include <string>
+
+
+#if defined(_WIN32)
+
+
 #include <windows.h>
 
 namespace dl::backend
@@ -32,9 +37,6 @@ namespace dl::backend
 		// handle is not nullHandle
 		static void* getSymbol(const Handle handle, const char* symbol)
 		{
-			if (handle == nullptr)
-				throw std::runtime_error("Handle is nullptr");
-
 			FARPROC proc =  GetProcAddress(handle, symbol);
 
 			if (proc == nullptr)
@@ -76,3 +78,61 @@ namespace dl::backend
 		}
 	};
 }
+
+
+#elif defined(__linux__) || defined(__APPLE__)
+
+
+#include <dlfcn.h>
+
+namespace dl::backend
+{
+	class DefaultBackend
+	{
+	public:
+		using Handle = void*;
+
+		static constexpr Handle nullHandle = nullptr;
+
+#if defined(__linux__)
+		static constexpr auto prefix = "lib";
+		static constexpr auto postfix = "";
+		static constexpr auto extension = "so";
+#else
+		static constexpr auto prefix = "lib";
+		static constexpr auto postfix = "";
+		static constexpr auto extension = "dylib";
+#endif
+
+
+		static Handle loadLibrary(const std::filesystem::path& path)
+		{
+			Handle handle = dlopen(path.wstring().c_str(), RTLD_LAZY);
+
+			if (handle == nullHandle)
+				throw std::runtime_error(dlerror());
+
+			return handle;
+		}
+
+		static void* getSymbol(const Handle handle, const char* symbol)
+		{
+			void* proc = dlsym(handle, symbol);
+
+			if (proc == nullptr)
+				throw std::runtime_error(dlerror());
+
+			return proc;
+		}
+
+		static void unloadLibrary(const Handle handle) noexcept
+		{
+			dlclose(handle);
+		}
+	};
+}
+
+
+#else
+#error "Unsupported platform"
+#endif
